@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using RedisCacheWebPoc.Services;
 
 namespace RedisCacheWebPoc
 {
@@ -29,6 +30,8 @@ namespace RedisCacheWebPoc
         {
             // Add framework services.
             services.AddMvc();
+
+            services.AddSingleton<ICacheService, CacheService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

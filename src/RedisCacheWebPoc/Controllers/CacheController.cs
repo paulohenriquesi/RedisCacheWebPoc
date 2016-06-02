@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using RedisCacheWebPoc.Model;
-using StackExchange.Redis;
+using RedisCacheWebPoc.Services;
 using System;
 using System.Diagnostics;
 using System.Text;
@@ -10,6 +9,13 @@ namespace RedisCacheWebPoc.Controllers
 {
     public class CacheController : Controller
     {
+        private readonly ICacheService _cacheService;
+
+        public CacheController(ICacheService cacheService)
+        {
+            _cacheService = cacheService;
+        }
+
         public IActionResult Add(int count)
         {
             var response = new StringBuilder();
@@ -18,16 +24,45 @@ namespace RedisCacheWebPoc.Controllers
             {
                 var transaction = new TransactionModel
                 {
+                    Affiliation = new AffiliationModel { Code = "AffCode", Key = "AffKey" },
+                    Amount = 19817,
+                    BraspagOrderId = Guid.NewGuid(),
+                    Country = "BRA",
+                    Currency = "BRL",
+                    Customer = new CustomerModel
+                    {
+                        Name = "Paulo Henrique da Silva Fernandes",
+                        Identity = "123.456.789-10"
+                    },
+                    Installments = 1,
+                    MerchantId = Guid.NewGuid(),
+                    MerchantOrderId = "201419081119",
+                    MustBeProbed = false,
+                    PaymentMethodId = Guid.NewGuid(),
+                    PaymentPlan = PaymentPlanEnum.Cash,
+                    ReceivedDate = DateTime.Now,
+                    RequestIp = "127.0.0.1",
+                    StartedDate = DateTime.Now,
+                    SentOrderId = "201419081123",
+                    Status = TransactionStatusEnum.NotFinished,
                     TransactionId = Guid.NewGuid(),
-                    AcquirerTransactionId = i.ToString(),
-                    Amount = new Random(i).Next()
+                    TransactionType = TransactionTypeEnum.AutomaticCapture,
+                    Card = new CardModel
+                    {
+                        ExpirationDate = "12/2015",
+                        Holder = "Teste T S Testando",
+                        Number = "4532117080573703",
+                        SecurityCode = "000",
+                        Brand = BrandEnum.Visa,
+                    },
+                    ServiceTaxAmount = 157
                 };
 
                 try
                 {
                     var timer = new Stopwatch();
                     timer.Start();
-                    Cache.StringSet(i.ToString(), JsonConvert.SerializeObject(transaction), expiry: new TimeSpan(0, 1, 0));
+                    _cacheService.Add(i.ToString(), transaction);
                     timer.Stop();
 
                     response.AppendFormat("#{0} added in {1}ms\r\n", i, timer.ElapsedMilliseconds);
@@ -41,9 +76,68 @@ namespace RedisCacheWebPoc.Controllers
             return Content(response.ToString());
         }
 
-        private readonly Lazy<ConnectionMultiplexer> _lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
-            ConnectionMultiplexer.Connect("transaction.redis.cache.windows.net:6380,password=AoAo9CkdCyUXn8fMYwX+6xbZvn3Mez98uEdy7aNZZJQ=,ssl=True,abortConnect=False"));
+        public IActionResult AddTransaction()
+        {
+            var id = Guid.NewGuid();
 
-        private IDatabase Cache => _lazyConnection.Value.GetDatabase();
+            var transaction = new TransactionModel
+            {
+                Affiliation = new AffiliationModel { Code = "AffCode", Key = "AffKey" },
+                Amount = 19817,
+                BraspagOrderId = Guid.NewGuid(),
+                Country = "BRA",
+                Currency = "BRL",
+                Customer = new CustomerModel
+                {
+                    Name = "Paulo Henrique da Silva Fernandes",
+                    Identity = "123.456.789-10"
+                },
+                Installments = 1,
+                MerchantId = Guid.NewGuid(),
+                MerchantOrderId = "201419081119",
+                MustBeProbed = false,
+                PaymentMethodId = Guid.NewGuid(),
+                PaymentPlan = PaymentPlanEnum.Cash,
+                ReceivedDate = DateTime.Now,
+                RequestIp = "127.0.0.1",
+                StartedDate = DateTime.Now,
+                SentOrderId = "201419081123",
+                Status = TransactionStatusEnum.NotFinished,
+                TransactionId = id,
+                TransactionType = TransactionTypeEnum.AutomaticCapture,
+                Card = new CardModel
+                {
+                    ExpirationDate = "12/2015",
+                    Holder = "Teste T S Testando",
+                    Number = "4532117080573703",
+                    SecurityCode = "000",
+                    Brand = BrandEnum.Visa,
+                },
+                ServiceTaxAmount = 157
+            };
+
+            var timer = new Stopwatch();
+            timer.Start();
+            _cacheService.Add(id.ToString(), transaction);
+            timer.Stop();
+
+            return Created("", new
+            {
+                Time = timer.ElapsedMilliseconds,
+                Id = id
+            });
+        }
+
+        public IActionResult Get(Guid id)
+        {
+            var timer = new Stopwatch();
+            timer.Start();
+            var response = _cacheService.Get<TransactionModel>(id.ToString());
+            timer.Stop();
+
+            response.GetTime = timer.ElapsedMilliseconds;
+
+            return Ok(response);
+        }
     }
 }

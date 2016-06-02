@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using RedisCacheWebPoc.Controllers;
 
 namespace RedisCacheWebPoc.Model
 {
     public class TransactionModel
     {
+        public long GetTime { get; set; }
         public string AcquirerTransactionId { get; set; }
         public long Amount { get; set; }
         public string AuthorizationCode { get; set; }
@@ -40,5 +42,11 @@ namespace RedisCacheWebPoc.Model
         public Guid TransactionId { get; set; }
         public long? VoidedAmount { get; set; }
         public DateTime? VoidedDate { get; set; }
+        public AffiliationModel Affiliation { get; set; }
+        public CustomerModel Customer { get; set; }
+        public PaymentPlanEnum PaymentPlan { get; set; }
+        public TransactionStatusEnum Status { get; set; }
+        public TransactionTypeEnum TransactionType { get; set; }
+        public CardModel Card { get; set; }
     }
 }

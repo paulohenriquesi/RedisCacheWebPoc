@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B22A1380-E3D0-4E0F-9C30-ED5C9B0792F1}"
 	ProjectSection(SolutionItems) = preProject
 		global.json = global.json
+		nuget.config = nuget.config
 	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "RedisCacheWebPoc", "src\RedisCacheWebPoc\RedisCacheWebPoc.xproj", "{0CB0AB68-61AD-4DF8-BC54-CB0BD87C1DF9}"
