@@ -16,6 +16,7 @@
             <input type="text" class="form-control" id="transactionCount" placeholder="0" />
         </div>
         <button type="button" class="btn btn-primary" id="btnCreateTransactions">Criar</button>
+        <button type="button" class="btn btn-danger" id="btnClearConsole">Limpar</button>
     </form>
 </div>
 <br />
@@ -25,13 +26,20 @@
     <div class="col-md-1"></div>
 </div>
 <div class="row top17">
-    <h2>Buscando transações no Redis Cache</h2>
-    <ol>
-        <li>Informe o Id da transação</li>
-        <li>Aperte o botão</li>
-        <li>??</li>
-        <li>Profit!</li>
-    </ol>
+
+    <div class="col-md-6">
+        <h2>Buscando transações no Redis Cache</h2>
+        <ol>
+            <li>Informe o Id da transação</li>
+            <li>Aperte o botão</li>
+            <li>??</li>
+            <li>Profit!</li>
+        </ol>
+    </div>
+    <div class="col-md-6">
+        <h2>Total de transações no Cache</h2>
+        <h1 id="total">0</h1>
+    </div>
 </div>
 <div class="row">
     <form class="form-inline">
@@ -56,18 +64,27 @@
         var createdTransactionCount = 0;
 
         $(function () {
-            $('#btnCreateTransactions').click(function () {
-                var count = parseInt($('#transactionCount').val());
+            setInterval(function () {
+                $.ajax({
+                    url: '/Cache/Count/'
+                }).done(function (r) {
+                    $('#total').html(r);
+                });
+            }, 1000);
 
-                createdTransactionCount = 0;
-
-                createTransaction(count);
+            $('#btnClearConsole').click(function() {
+                $('#console').html('');
             });
 
-            $('#btnGetTransaction').click(function() {
+            $('#btnCreateTransactions').click(function () {
+                var count = parseInt($('#transactionCount').val());
+                createTransaction(createdTransactionCount + count);
+            });
+
+            $('#btnGetTransaction').click(function () {
                 $.ajax({
                     url: '/Cache/Get/' + $('#transactionId').val(),
-                }).done(function(r) {
+                }).done(function (r) {
                     $('#transactionJson').html(syntaxHighlight(JSON.stringify(r, null, 4)));
                 });
             });

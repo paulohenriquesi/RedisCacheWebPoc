@@ -139,5 +139,56 @@ namespace RedisCacheWebPoc.Controllers
 
             return Ok(response);
         }
+
+        public IActionResult GetSet()
+        {
+            var id = Guid.NewGuid();
+
+            var transaction = new TransactionModel
+            {
+                Affiliation = new AffiliationModel { Code = "AffCode", Key = "AffKey" },
+                Amount = 19817,
+                BraspagOrderId = Guid.NewGuid(),
+                Country = "BRA",
+                Currency = "BRL",
+                Customer = new CustomerModel
+                {
+                    Name = "Paulo Henrique da Silva Fernandes",
+                    Identity = "123.456.789-10"
+                },
+                Installments = 1,
+                MerchantId = Guid.NewGuid(),
+                MerchantOrderId = "201419081119",
+                MustBeProbed = false,
+                PaymentMethodId = Guid.NewGuid(),
+                PaymentPlan = PaymentPlanEnum.Cash,
+                ReceivedDate = DateTime.Now,
+                RequestIp = "127.0.0.1",
+                StartedDate = DateTime.Now,
+                SentOrderId = "201419081123",
+                Status = TransactionStatusEnum.NotFinished,
+                TransactionId = id,
+                TransactionType = TransactionTypeEnum.AutomaticCapture,
+                Card = new CardModel
+                {
+                    ExpirationDate = "12/2015",
+                    Holder = "Teste T S Testando",
+                    Number = "4532117080573703",
+                    SecurityCode = "000",
+                    Brand = BrandEnum.Visa,
+                },
+                ServiceTaxAmount = 157
+            };
+            
+            _cacheService.Add(id.ToString(), transaction);
+            var tx = _cacheService.Get<TransactionModel>(id.ToString());
+
+            return Ok(tx);
+        }
+
+        public IActionResult Count()
+        {
+            return Ok(_cacheService.Count());
+        }
     }
 }

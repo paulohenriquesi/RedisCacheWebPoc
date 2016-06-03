@@ -7,6 +7,7 @@ namespace RedisCacheWebPoc.Model
     public class TransactionModel
     {
         public long GetTime { get; set; }
+        public Guid TransactionId { get; set; }
         public string AcquirerTransactionId { get; set; }
         public long Amount { get; set; }
         public string AuthorizationCode { get; set; }
@@ -39,7 +40,6 @@ namespace RedisCacheWebPoc.Model
         public string SentOrderId { get; set; }
         public long ServiceTaxAmount { get; set; }
         public DateTime? StartedDate { get; set; }
-        public Guid TransactionId { get; set; }
         public long? VoidedAmount { get; set; }
         public DateTime? VoidedDate { get; set; }
         public AffiliationModel Affiliation { get; set; }
